@@ -1,27 +1,45 @@
 package org.example.dateconverter
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 import org.example.dateconverter.util.DateConverter
 import org.example.dateconverter.util.IsoDateTimeUtil
-import org.example.dateconverter.util.IsoDateTimeUtil.gregorianMonthLength
-import org.example.dateconverter.util.safeGregorianDay
-import org.example.dateconverter.util.safeJalaliDay
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
@@ -47,8 +65,8 @@ fun DateConverterScreen() {
 
     // رشته‌ها برای ورودی میلادی
     var gregorianYear by remember { mutableStateOf(todayGregorian.year.toString()) }
-    var gregorianMonth by remember { mutableStateOf(todayGregorian.monthNumber.toString()) }
-    var gregorianDay by remember { mutableStateOf(todayGregorian.dayOfMonth.toString()) }
+    var gregorianMonth by remember { mutableStateOf(todayGregorian.month.number.toString()) }
+    var gregorianDay by remember { mutableStateOf(todayGregorian.day.toString()) }
 
     // نتایج نمایش
     var gregorianResult by remember { mutableStateOf("") }
@@ -197,6 +215,15 @@ fun MainScreen() {
     var isoGregorian by remember { mutableStateOf("") }
     var isoJalali by remember { mutableStateOf("") }
 
+    // تاریخ اول
+    var gy1 by remember { mutableStateOf(2025) }
+    var gm1 by remember { mutableStateOf(1) }
+    var gd1 by remember { mutableStateOf(1) }
+
+    // تاریخ دوم
+    var gy2 by remember { mutableStateOf(2025) }
+    var gm2 by remember { mutableStateOf(12) }
+    var gd2 by remember { mutableStateOf(20) }
 
     var now by remember { mutableStateOf("") }
 
@@ -235,7 +262,7 @@ fun MainScreen() {
             )
 
             val maxDay = DateConverter(jy, jm, 1).getMonthLength()
-            jd = safeJalaliDay(jy, jm, jd)
+            jd = IsoDateTimeUtil.safeJalaliDay(jy, jm, jd)
 
             SimpleDropdown(
                 "روز",
@@ -248,7 +275,7 @@ fun MainScreen() {
 
         Button(onClick = {
             runCatching {
-                val safeDay = safeJalaliDay(jy, jm, jd)
+                val safeDay = IsoDateTimeUtil.safeJalaliDay(jy, jm, jd)
                 val dc = DateConverter(jy, jm, safeDay)
                 val gDate = dc.toGregorian()
 
@@ -286,7 +313,7 @@ fun MainScreen() {
 
 
             val maxDay = IsoDateTimeUtil.gregorianMonthLength(gy, gm)
-            gd = safeGregorianDay(gy, gm, gd)
+            gd = IsoDateTimeUtil.safeGregorianDay(gy, gm, gd)
 
             SimpleDropdown(
                 "روز",
@@ -298,7 +325,7 @@ fun MainScreen() {
 
         Button(onClick = {
             runCatching {
-                val safeDay = safeGregorianDay(gy, gm, gd)
+                val safeDay = IsoDateTimeUtil.safeGregorianDay(gy, gm, gd)
                 val gDate = LocalDate(gy, gm, safeDay)
 
 
@@ -316,7 +343,7 @@ fun MainScreen() {
 
         Divider()
 
-// ================= ISO Section =================
+        // ================= ISO Section =================
         Text("📍 ورود تاریخ ISO", style = MaterialTheme.typography.titleLarge)
 
         OutlinedTextField(
@@ -364,6 +391,120 @@ fun MainScreen() {
         Text("📅 جلالی: $resultJalali")
         Text("💾 ISO (برای دیتابیس):")
         Text(resultIso, style = MaterialTheme.typography.bodyMedium)
+
+        Divider()
+
+        // ================= محاسبه فاصله بین دو تاریخ میلادی (ورودی دستی) =================
+        Text("⏱ محاسبه فاصله بین دو تاریخ میلادی", style = MaterialTheme.typography.titleLarge)
+
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+            // --- تاریخ اول ---
+            Text("تاریخ اول", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SimpleDropdown(
+                    "سال",
+                    gregorianYears,
+                    gy1,
+                    onSelect = { gy1 = it },
+                    modifier = Modifier.weight(1f)
+                )
+                SimpleDropdown(
+                    "ماه",
+                    gregorianMonths,
+                    gm1,
+                    onSelect = { gm1 = it },
+                    modifier = Modifier.weight(1f)
+                )
+
+                val maxDay1 = IsoDateTimeUtil.gregorianMonthLength(gy1, gm1)
+                val safeGd1 = gd1.coerceIn(1, maxDay1)
+
+                SimpleDropdown(
+                    "روز",
+                    (1..maxDay1).toList(),
+                    safeGd1,
+                    onSelect = { gd1 = it },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // --- تاریخ دوم ---
+            Text("تاریخ دوم", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SimpleDropdown(
+                    "سال",
+                    gregorianYears,
+                    gy2,
+                    onSelect = { gy2 = it },
+                    modifier = Modifier.weight(1f)
+                )
+                SimpleDropdown(
+                    "ماه",
+                    gregorianMonths,
+                    gm2,
+                    onSelect = { gm2 = it },
+                    modifier = Modifier.weight(1f)
+                )
+
+                val maxDay2 = IsoDateTimeUtil.gregorianMonthLength(gy2, gm2)
+                val safeGd2 = gd2.coerceIn(1, maxDay2)
+
+                SimpleDropdown(
+                    "روز",
+                    (1..maxDay2).toList(),
+                    safeGd2,
+                    onSelect = { gd2 = it },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // محاسبه تاریخ‌ها
+            val date1 = remember(gy1, gm1, gd1) {
+                runCatching { LocalDate(gy1, gm1, gd1.coerceIn(1, IsoDateTimeUtil.gregorianMonthLength(gy1, gm1))) }.getOrNull()
+            }
+
+            val date2 = remember(gy2, gm2, gd2) {
+                runCatching { LocalDate(gy2, gm2, gd2.coerceIn(1, IsoDateTimeUtil.gregorianMonthLength(gy2, gm2))) }.getOrNull()
+            }
+
+            if (date1 != null && date2 != null) {
+                val differenceText = IsoDateTimeUtil.gregorianDateDifference(date1, date2)
+                val daysCount = IsoDateTimeUtil.gregorianDaysBetween(date1, date2)
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "فاصله تقریبی:",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = differenceText,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = "دقیق: $daysCount روز",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+
+                        if (daysCount == 0L) {
+                            Text("➡️ دو تاریخ یکسان هستند", color = Color.Gray)
+                        }
+                    }
+                }
+            } else {
+                Text("یکی از تاریخ‌ها نامعتبر است", color = MaterialTheme.colorScheme.error)
+            }
+        }
+
     }
 }
 

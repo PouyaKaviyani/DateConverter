@@ -92,14 +92,64 @@ object IsoDateTimeUtil {
         }
     }
 
-}
+    /**
+     * محاسبه فاصله بین دو تاریخ میلادی به صورت تقریبی و خوانا (سال، ماه، روز)
+     * همیشه تاریخ کوچکتر را به عنوان شروع در نظر می‌گیرد
+     */
+    fun gregorianDateDifference(
+        date1: LocalDate,
+        date2: LocalDate
+    ): String {
+        val start = if (date1 <= date2) date1 else date2
+        val end = if (date1 <= date2) date2 else date1
 
-fun safeJalaliDay(year: Int, month: Int, day: Int): Int {
-    val maxDay = DateConverter(year, month, 1).getMonthLength()
-    return day.coerceIn(1, maxDay)
-}
+        var years = end.year - start.year
+        var months = end.monthNumber - start.monthNumber
+        var days = end.dayOfMonth - start.dayOfMonth
 
-fun safeGregorianDay(year: Int, month: Int, day: Int): Int {
-    val maxDay = IsoDateTimeUtil.gregorianMonthLength(year, month)
-    return day.coerceIn(1, maxDay)
+        // تنظیم روزها اگر منفی شد
+        if (days < 0) {
+            months -= 1
+            // محاسبه تعداد روزهای ماه قبلی
+            val previousMonth = if (start.monthNumber == 1) 12 else start.monthNumber - 1
+            val previousYear = if (start.monthNumber == 1) start.year - 1 else start.year
+            days += gregorianMonthLength(previousYear, previousMonth)
+        }
+
+        // تنظیم ماه‌ها اگر منفی شد
+        if (months < 0) {
+            years -= 1
+            months += 12
+        }
+
+        return buildString {
+            if (years > 0) append("$years سال ")
+            if (months > 0) append("$months ماه ")
+            if (days > 0 || (years == 0 && months == 0)) append("$days روز")
+
+            if (isEmpty()) append("همان روز")
+        }.trim()
+    }
+
+    /**
+     * نسخه ساده‌تر: فاصله به تعداد روز دقیق
+     */
+    fun gregorianDaysBetween(date1: LocalDate, date2: LocalDate): Long {
+        val start = if (date1 <= date2) date1 else date2
+        val end = if (date1 <= date2) date2 else date1
+
+        // تبدیل به تعداد روز از یک مبدا مشترک (مثلاً epoch day در kotlinx.datetime)
+        return (end.toEpochDays() - start.toEpochDays()).toLong()
+    }
+
+    fun safeJalaliDay(year: Int, month: Int, day: Int): Int {
+        val maxDay = DateConverter(year, month, 1).getMonthLength()
+        return day.coerceIn(1, maxDay)
+    }
+
+    fun safeGregorianDay(year: Int, month: Int, day: Int): Int {
+        val maxDay = IsoDateTimeUtil.gregorianMonthLength(year, month)
+        return day.coerceIn(1, maxDay)
+    }
+
 }
