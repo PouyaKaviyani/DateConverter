@@ -47,6 +47,10 @@ dependencies {
 
 ---
 
+[![](https://jitpack.io/v/PouyaKaviyani/DateConverter.svg)](https://jitpack.io/#PouyaKaviyani/DateConverter)
+
+---
+
 ## License
 
 MIT License
