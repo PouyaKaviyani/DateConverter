@@ -51,11 +51,11 @@ kotlin {
 }
 
 android {
-    namespace = "org.example.dateconverter"
+    namespace = "org.pouyakaviyani.dateconverter"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "org.example.dateconverter"
+        applicationId = "org.pouyakaviyani.dateconverter"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

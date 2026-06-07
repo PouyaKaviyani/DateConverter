@@ -1,4 +1,4 @@
-package org.example.dateconverter
+package org.pouyakaviyani.dateconverter
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

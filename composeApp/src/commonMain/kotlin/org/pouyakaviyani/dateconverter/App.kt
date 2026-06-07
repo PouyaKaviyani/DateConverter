@@ -1,4 +1,4 @@
-package org.example.dateconverter
+package org.pouyakaviyani.dateconverter
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
-import org.example.dateconverter.util.DateConverter
-import org.example.dateconverter.util.IsoDateTime
+import org.pouyakaviyani.dateconverter.util.DateConverter
+import org.pouyakaviyani.dateconverter.util.IsoDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

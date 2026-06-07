@@ -1,4 +1,4 @@
-package org.example.dateconverter.util
+package org.pouyakaviyani.dateconverter.util
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
