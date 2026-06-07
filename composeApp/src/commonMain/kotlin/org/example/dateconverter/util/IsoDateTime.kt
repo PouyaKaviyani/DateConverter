@@ -3,12 +3,13 @@ package org.example.dateconverter.util
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
-object IsoDateTimeUtil {
+object IsoDateTime {
 
     private val zone = TimeZone.currentSystemDefault()
 
@@ -104,15 +105,15 @@ object IsoDateTimeUtil {
         val end = if (date1 <= date2) date2 else date1
 
         var years = end.year - start.year
-        var months = end.monthNumber - start.monthNumber
-        var days = end.dayOfMonth - start.dayOfMonth
+        var months = end.month.number - start.month.number
+        var days = end.day - start.day
 
         // تنظیم روزها اگر منفی شد
         if (days < 0) {
             months -= 1
             // محاسبه تعداد روزهای ماه قبلی
-            val previousMonth = if (start.monthNumber == 1) 12 else start.monthNumber - 1
-            val previousYear = if (start.monthNumber == 1) start.year - 1 else start.year
+            val previousMonth = if (start.month.number == 1) 12 else start.month.number - 1
+            val previousYear = if (start.month.number == 1) start.year - 1 else start.year
             days += gregorianMonthLength(previousYear, previousMonth)
         }
 
@@ -139,7 +140,7 @@ object IsoDateTimeUtil {
         val end = if (date1 <= date2) date2 else date1
 
         // تبدیل به تعداد روز از یک مبدا مشترک (مثلاً epoch day در kotlinx.datetime)
-        return (end.toEpochDays() - start.toEpochDays()).toLong()
+        return (end.toEpochDays() - start.toEpochDays())
     }
 
     fun safeJalaliDay(year: Int, month: Int, day: Int): Int {
@@ -148,7 +149,7 @@ object IsoDateTimeUtil {
     }
 
     fun safeGregorianDay(year: Int, month: Int, day: Int): Int {
-        val maxDay = IsoDateTimeUtil.gregorianMonthLength(year, month)
+        val maxDay = gregorianMonthLength(year, month)
         return day.coerceIn(1, maxDay)
     }
 

@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 import org.example.dateconverter.util.DateConverter
-import org.example.dateconverter.util.IsoDateTimeUtil
+import org.example.dateconverter.util.IsoDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -229,7 +229,7 @@ fun MainScreen() {
 
     LaunchedEffect(Unit){
         while (true){
-            now = IsoDateTimeUtil.nowIso()
+            now = IsoDateTime.nowIso()
             delay(100L)
         }
     }
@@ -262,7 +262,7 @@ fun MainScreen() {
             )
 
             val maxDay = DateConverter(jy, jm, 1).getMonthLength()
-            jd = IsoDateTimeUtil.safeJalaliDay(jy, jm, jd)
+            jd = IsoDateTime.safeJalaliDay(jy, jm, jd)
 
             SimpleDropdown(
                 "روز",
@@ -275,14 +275,14 @@ fun MainScreen() {
 
         Button(onClick = {
             runCatching {
-                val safeDay = IsoDateTimeUtil.safeJalaliDay(jy, jm, jd)
+                val safeDay = IsoDateTime.safeJalaliDay(jy, jm, jd)
                 val dc = DateConverter(jy, jm, safeDay)
                 val gDate = dc.toGregorian()
 
 
                 resultJalali = dc.toString()
                 resultGregorian = gDate.toString()
-                resultIso = IsoDateTimeUtil.jalaliToIso(dc)
+                resultIso = IsoDateTime.jalaliToIso(dc)
 
                 error = ""
             }.onFailure {
@@ -312,8 +312,8 @@ fun MainScreen() {
             )
 
 
-            val maxDay = IsoDateTimeUtil.gregorianMonthLength(gy, gm)
-            gd = IsoDateTimeUtil.safeGregorianDay(gy, gm, gd)
+            val maxDay = IsoDateTime.gregorianMonthLength(gy, gm)
+            gd = IsoDateTime.safeGregorianDay(gy, gm, gd)
 
             SimpleDropdown(
                 "روز",
@@ -325,13 +325,13 @@ fun MainScreen() {
 
         Button(onClick = {
             runCatching {
-                val safeDay = IsoDateTimeUtil.safeGregorianDay(gy, gm, gd)
+                val safeDay = IsoDateTime.safeGregorianDay(gy, gm, gd)
                 val gDate = LocalDate(gy, gm, safeDay)
 
 
                 resultGregorian = gDate.toString()
                 resultJalali = gDate.toString()
-                resultIso = IsoDateTimeUtil.gregorianToIso(gDate)
+                resultIso = IsoDateTime.gregorianToIso(gDate)
 
                 error = ""
             }.onFailure {
@@ -356,8 +356,8 @@ fun MainScreen() {
 
         Button(onClick = {
             runCatching {
-                val gDate = IsoDateTimeUtil.isoToGregorianDate(isoInput)
-                val jDate = IsoDateTimeUtil.isoToJalali(isoInput)
+                val gDate = IsoDateTime.isoToGregorianDate(isoInput)
+                val jDate = IsoDateTime.isoToJalali(isoInput)
 
                 isoGregorian = gDate.toString()
                 isoJalali = jDate.toString()
@@ -417,7 +417,7 @@ fun MainScreen() {
                     modifier = Modifier.weight(1f)
                 )
 
-                val maxDay1 = IsoDateTimeUtil.gregorianMonthLength(gy1, gm1)
+                val maxDay1 = IsoDateTime.gregorianMonthLength(gy1, gm1)
                 val safeGd1 = gd1.coerceIn(1, maxDay1)
 
                 SimpleDropdown(
@@ -447,7 +447,7 @@ fun MainScreen() {
                     modifier = Modifier.weight(1f)
                 )
 
-                val maxDay2 = IsoDateTimeUtil.gregorianMonthLength(gy2, gm2)
+                val maxDay2 = IsoDateTime.gregorianMonthLength(gy2, gm2)
                 val safeGd2 = gd2.coerceIn(1, maxDay2)
 
                 SimpleDropdown(
@@ -461,16 +461,16 @@ fun MainScreen() {
 
             // محاسبه تاریخ‌ها
             val date1 = remember(gy1, gm1, gd1) {
-                runCatching { LocalDate(gy1, gm1, gd1.coerceIn(1, IsoDateTimeUtil.gregorianMonthLength(gy1, gm1))) }.getOrNull()
+                runCatching { LocalDate(gy1, gm1, gd1.coerceIn(1, IsoDateTime.gregorianMonthLength(gy1, gm1))) }.getOrNull()
             }
 
             val date2 = remember(gy2, gm2, gd2) {
-                runCatching { LocalDate(gy2, gm2, gd2.coerceIn(1, IsoDateTimeUtil.gregorianMonthLength(gy2, gm2))) }.getOrNull()
+                runCatching { LocalDate(gy2, gm2, gd2.coerceIn(1, IsoDateTime.gregorianMonthLength(gy2, gm2))) }.getOrNull()
             }
 
             if (date1 != null && date2 != null) {
-                val differenceText = IsoDateTimeUtil.gregorianDateDifference(date1, date2)
-                val daysCount = IsoDateTimeUtil.gregorianDaysBetween(date1, date2)
+                val differenceText = IsoDateTime.gregorianDateDifference(date1, date2)
+                val daysCount = IsoDateTime.gregorianDaysBetween(date1, date2)
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
