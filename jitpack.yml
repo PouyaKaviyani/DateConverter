@@ -1,0 +1,9 @@
+jdk:
+  - openjdk17   # چون پروژه‌ت نیاز به Java 17 داره (از لاگ مشخصه)
+
+before_install:
+  - sdk install java 17.0.14-amzn   # اختیاری، ولی کمک می‌کنه
+
+# اگر فقط یک ماژول خاص رو می‌خوای منتشر کنی:
+# projects:
+#   - JalaliDateConverter

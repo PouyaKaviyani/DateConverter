@@ -12,7 +12,6 @@ group = "com.github.PouyaKaviyani"
 version = "1.0.0"
 
 kotlin {
-
     androidLibrary {
         namespace = "com.pouyakaviyani.jalalidateconverter"
         compileSdk = 36
@@ -23,36 +22,17 @@ kotlin {
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-
-
     }
 
     val xcfName = "JalaliDateConverterKit"
 
-    iosX64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
+    iosX64 { binaries.framework { baseName = xcfName } }
+    iosArm64 { binaries.framework { baseName = xcfName } }
+    iosSimulatorArm64 { binaries.framework { baseName = xcfName } }
 
     sourceSets {
-
         commonMain.dependencies {
             implementation(libs.kotlin.stdlib)
-
-            // DateTime
             implementation(libs.kotlinx.datetime)
         }
 
@@ -60,22 +40,17 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
-        androidMain.dependencies {
-
-        }
+        androidMain.dependencies { }
 
         getByName("androidDeviceTest").dependencies {
             implementation(libs.androidx.core)
             implementation(libs.androidx.runner)
             implementation(libs.androidx.testExt.junit)
         }
-
-        iosMain.dependencies {
-
-        }
     }
 }
 
+// فقط repositories — Kotlin خودش publications رو مدیریت می‌کنه
 publishing {
     repositories {
         mavenLocal()
